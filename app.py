@@ -12,7 +12,7 @@ import os
 sys.path.insert(0, os.path.dirname(__file__))
 
 from journal import DreamJournal
-from nlp_pipeline import process_dream, USE_TRANSFORMERS
+from np_pipeline import process_dream, USE_TRANSFORMERS
 from analyzer import (
     symbol_frequency,
     symbol_co_occurrence,
@@ -23,7 +23,7 @@ from analyzer import (
     find_recurring_dreams,
     generate_insights,
 )
-from visualizations import (
+from visualization import (
     emotion_timeline_chart,
     emotion_radar_chart,
     symbol_bar_chart,
@@ -624,7 +624,7 @@ elif page == "✦ Dashboard":
             emo_counts = Counter()
             for e in entries:
                 if e.emotions:
-                    top = max(e.emotions, key=e.emotions.get)
+                    top = max(e.emotions.items(), key=lambda item: item[1])[0]
                     emo_counts[top] += 1
             top_emo = emo_counts.most_common(1)[0][0].capitalize() if emo_counts else "—"
             st.metric("Top Emotion", top_emo)
@@ -742,7 +742,7 @@ elif page == "✦ Explore Dreams":
         for idx, entry in enumerate(filtered):
             emo_icon = "🌙"
             if entry.emotions:
-                top_emo = max(entry.emotions, key=entry.emotions.get)
+                top_emo = max(entry.emotions.items(), key=lambda item: item[1])[0]
                 emo_map = {
                     "joy": "☀️", "fear": "👁️", "anxiety": "🌊", "sadness": "🌧️",
                     "anger": "🔥", "wonder": "✨", "confusion": "🌀", "peace": "🍃",
