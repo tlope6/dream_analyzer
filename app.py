@@ -12,7 +12,7 @@ import os
 sys.path.insert(0, os.path.dirname(__file__))
 
 from journal import DreamJournal
-from np_pipeline import process_dream, USE_TRANSFORMERS
+from nlp_pipeline import process_dream, USE_TRANSFORMERS
 from analyzer import (
     symbol_frequency,
     symbol_co_occurrence,
@@ -624,7 +624,7 @@ elif page == "✦ Dashboard":
             emo_counts = Counter()
             for e in entries:
                 if e.emotions:
-                    top = max(e.emotions.items(), key=lambda item: item[1])[0]
+                    top = max(e.emotions.items(), key=lambda x: x[1])[0]
                     emo_counts[top] += 1
             top_emo = emo_counts.most_common(1)[0][0].capitalize() if emo_counts else "—"
             st.metric("Top Emotion", top_emo)
@@ -648,7 +648,7 @@ elif page == "✦ Dashboard":
                     font=dict(family="Quicksand", color="#c4b8e0"),
                     title_font=dict(family="Cormorant Garamond", size=20),
                 )
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, use_container_width=True, key="chart_emotion_timeline")
             with col_b:
                 fig = emotion_radar_chart(entries)
                 fig.update_layout(
@@ -657,7 +657,7 @@ elif page == "✦ Dashboard":
                     font=dict(family="Quicksand", color="#c4b8e0"),
                     title_font=dict(family="Cormorant Garamond", size=20),
                 )
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, use_container_width=True, key="chart_emotion_radar")
 
             fig = dominant_emotion_pie(entries)
             fig.update_layout(
@@ -666,7 +666,7 @@ elif page == "✦ Dashboard":
                 font=dict(family="Quicksand", color="#c4b8e0"),
                 title_font=dict(family="Cormorant Garamond", size=20),
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, key="chart_emotion_pie")
 
         with tab2:
             fig = symbol_bar_chart(entries)
@@ -677,7 +677,7 @@ elif page == "✦ Dashboard":
                 title_font=dict(family="Cormorant Garamond", size=20),
             )
             fig.update_traces(marker_color="rgba(184, 169, 212, 0.6)")
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, key="chart_symbol_bar")
 
         with tab3:
             fig = co_occurrence_network(entries, min_count=1)
@@ -687,7 +687,7 @@ elif page == "✦ Dashboard":
                 font=dict(family="Quicksand", color="#c4b8e0"),
                 title_font=dict(family="Cormorant Garamond", size=20),
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, key="chart_co_occurrence")
 
             co_occ = symbol_co_occurrence(entries, min_count=1)
             if co_occ:
@@ -742,7 +742,7 @@ elif page == "✦ Explore Dreams":
         for idx, entry in enumerate(filtered):
             emo_icon = "🌙"
             if entry.emotions:
-                top_emo = max(entry.emotions.items(), key=lambda item: item[1])[0]
+                top_emo = max(entry.emotions.items(), key=lambda x: x[1])[0]
                 emo_map = {
                     "joy": "☀️", "fear": "👁️", "anxiety": "🌊", "sadness": "🌧️",
                     "anger": "🔥", "wonder": "✨", "confusion": "🌀", "peace": "🍃",
