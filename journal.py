@@ -6,13 +6,31 @@ Uses a local JSON file for simplicity.
 import json
 import os
 import uuid
+import tempfile
 from datetime import datetime, date
 from dataclasses import dataclass, field, asdict
 from typing import Optional
 
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
-JOURNAL_FILE = os.path.join(DATA_DIR, "dreams.json")
+# Use temp directory for cloud deployments, local data/ for development
+def _get_data_path():
+    local_dir = os.path.join(os.path.dirname(__file__), "data")
+    try:
+        os.makedirs(local_dir, exist_ok=True)
+        # Test if we can write
+        test_file = os.path.join(local_dir, ".write_test")
+        with open(test_file, "w") as f:
+            f.write("test")
+        os.remove(test_file)
+        return os.path.join(local_dir, "dreams.json")
+    except (OSError, PermissionError):
+        # Fall back to temp directory
+        tmp_dir = os.path.join(tempfile.gettempdir(), "dreamscape")
+        os.makedirs(tmp_dir, exist_ok=True)
+        return os.path.join(tmp_dir, "dreams.json")
+
+
+JOURNAL_FILE = _get_data_path()
 
 
 @dataclass
