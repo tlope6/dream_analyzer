@@ -72,7 +72,7 @@ class DreamJournal:
     ) -> DreamEntry:
         """Add a new dream entry and save."""
         entry = DreamEntry(
-            id=str(uuid.uuid4())[:8],
+            id=str(uuid.uuid4()),
             date=dream_date or date.today().isoformat(),
             text=text,
             tags=tags or [],

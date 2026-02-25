@@ -12,7 +12,7 @@ import os
 sys.path.insert(0, os.path.dirname(__file__))
 
 from journal import DreamJournal
-from np_pipeline import process_dream, USE_TRANSFORMERS
+from nlp_pipeline import process_dream, USE_TRANSFORMERS
 from analyzer import (
     symbol_frequency,
     symbol_co_occurrence,
@@ -23,7 +23,7 @@ from analyzer import (
     find_recurring_dreams,
     generate_insights,
 )
-from visualization import (
+from visualizations import (
     emotion_timeline_chart,
     emotion_radar_chart,
     symbol_bar_chart,
@@ -399,7 +399,7 @@ hr {
 """, unsafe_allow_html=True)
 
 
-# ── Initialize journal
+# ── Initialize journal ─────────────────────────────────────────────────────
 @st.cache_resource
 def get_journal():
     return DreamJournal()
@@ -407,7 +407,7 @@ def get_journal():
 journal = get_journal()
 
 
-# ── Sidebar 
+# ── Sidebar ────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
         <div style="text-align: center; padding: 20px 0 10px 0;">
@@ -450,10 +450,10 @@ with st.sidebar:
 
     if st.button("✦ Load Sample Dreams", use_container_width=True):
         samples = journal.get_sample_dreams()
+        existing_texts = {e.text.strip() for e in journal.entries}
         count = 0
         for sample in samples:
-            existing = [e for e in journal.entries if e.date == sample["date"]]
-            if not existing:
+            if sample["text"].strip() not in existing_texts:
                 entry = journal.add_dream(
                     text=sample["text"],
                     dream_date=sample["date"],
@@ -624,7 +624,7 @@ elif page == "✦ Dashboard":
             emo_counts = Counter()
             for e in entries:
                 if e.emotions:
-                    top = max(e.emotions.items(), key=lambda x: x[1])[0]
+                    top = max(e.emotions, key=e.emotions.get)
                     emo_counts[top] += 1
             top_emo = emo_counts.most_common(1)[0][0].capitalize() if emo_counts else "—"
             st.metric("Top Emotion", top_emo)
@@ -739,10 +739,10 @@ elif page == "✦ Explore Dreams":
 
         st.markdown(f"<p style='color: #6b5b8a; font-size: 0.85rem;'>Showing {len(filtered)} of {len(entries)} dreams</p>", unsafe_allow_html=True)
 
-        for entry in filtered:
+        for idx, entry in enumerate(filtered):
             emo_icon = "🌙"
             if entry.emotions:
-                top_emo = max(entry.emotions.items(), key=lambda x: x[1])[0]
+                top_emo = max(entry.emotions, key=entry.emotions.get)
                 emo_map = {
                     "joy": "☀️", "fear": "👁️", "anxiety": "🌊", "sadness": "🌧️",
                     "anger": "🔥", "wonder": "✨", "confusion": "🌀", "peace": "🍃",
@@ -774,7 +774,7 @@ elif page == "✦ Explore Dreams":
                 col_x, col_y = st.columns([1, 1])
                 with col_x:
                     if entry.embedding:
-                        if st.button("Find echoes ✦", key=f"sim_{entry.id}"):
+                        if st.button("Find echoes ✦", key=f"sim_{idx}_{entry.id}"):
                             similar = find_similar_dreams(entry, journal.entries)
                             if similar:
                                 for s in similar:
@@ -788,7 +788,7 @@ elif page == "✦ Explore Dreams":
                             else:
                                 st.caption("No echoes found...")
                 with col_y:
-                    if st.button("🗑️ Release", key=f"del_{entry.id}"):
+                    if st.button("🗑️ Release", key=f"del_{idx}_{entry.id}"):
                         journal.delete_dream(entry.id)
                         st.rerun()
 
