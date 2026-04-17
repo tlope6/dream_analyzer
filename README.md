@@ -50,5 +50,9 @@ dream_journal/
 - Streamlit (web dashboard)
 - Plotly (interactive visualizations)
 
+
+## Image
+
+
 <img width="1506" height="789" alt="Screenshot 2026-04-17 at 2 07 36 PM" src="https://github.com/user-attachments/assets/5397fc7e-724b-4154-89ec-b17d4a1ca17c" />
 
